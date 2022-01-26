@@ -11,34 +11,30 @@ interface IAuthor {
 }
 
 interface IPost {
+  id: string;
   title: string;
   body: string;
   author: IAuthor;
 }
 
 interface IProps {
-  data: IPost[];
+  post: IPost;
 }
 
-const PostsPage: NextPage = () => {
-  const [post, setPost] = useState<IPost>();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+export async function getServerSideProps({ params }: any) {
+  const res = await client.query({
+    query: GET_ONE_POST,
+    variables: { postId: params.id },
+  });
 
-  useEffect(() => {
-    setIsLoading(true);
+  return {
+    props: {
+      post: res.data.post,
+    },
+  };
+}
 
-    client
-      .query({
-        query: GET_ONE_POST,
-        variables: { postId: 1 },
-      })
-      .then((res: ApolloQueryResult<any>) => {
-        setPost(res.data.post);
-      });
-
-    setIsLoading(false);
-  }, []);
-
+const PostsPage: NextPage<IProps> = ({ post }: IProps) => {
   return (
     <div>
       <Head>
@@ -52,7 +48,7 @@ const PostsPage: NextPage = () => {
       </header>
 
       <main>
-        { isLoading ? 'loading...' : <Post post={post} />}
+        <Post post={post} />
       </main>
     </div>
   );

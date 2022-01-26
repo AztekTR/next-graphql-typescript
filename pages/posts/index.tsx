@@ -3,13 +3,14 @@ import Head from "next/head";
 import { gql } from "@apollo/client";
 import client from "../../appolo-client";
 import Post from "../../src/components/posts/Post";
-import {GET_ALL_POSTS} from '../../src/graphql/queries/posts';
+import { GET_ALL_POSTS } from "../../src/graphql/queries/posts";
 
 interface IAuthor {
   username: string;
 }
 
 interface IPost {
+  id: string;
   title: string;
   body: string;
   author: IAuthor;
@@ -20,7 +21,7 @@ interface IProps {
 }
 
 export async function getServerSideProps() {
-  const { data } = await client.query({query: GET_ALL_POSTS});
+  const { data } = await client.query({ query: GET_ALL_POSTS });
 
   return {
     props: {
@@ -29,7 +30,7 @@ export async function getServerSideProps() {
   };
 }
 
-const PostsPage: NextPage = ({ data }: any) => {
+const PostsPage: NextPage<IProps> = ({ data }: IProps) => {
   return (
     <div>
       <Head>
@@ -44,7 +45,7 @@ const PostsPage: NextPage = ({ data }: any) => {
 
       <main>
         {data.map((post: any) => (
-          <Post post={post} key={post.id} />
+          <Post post={post} key={post.id} isLink/>
         ))}
       </main>
     </div>
