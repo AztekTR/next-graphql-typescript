@@ -3,7 +3,7 @@ import Head from "next/head";
 import { gql } from "@apollo/client";
 import client from "../../appolo-client";
 import Post from "../../src/components/posts/Post";
-import {GET_ALL_POSTS} from '../../src/graphql/queries/posts';
+import { GET_ONE_POST } from "../../src/graphql/queries/posts";
 
 interface IAuthor {
   username: string;
@@ -20,16 +20,26 @@ interface IProps {
 }
 
 export async function getServerSideProps() {
-  const { data } = await client.query({query: GET_ALL_POSTS});
-
-  return {
-    props: {
-      data: data.posts.data,
-    },
-  };
+  let data;
+  try {
+    const res = await client.query({
+      query: GET_ONE_POST,
+      variables: { postId: 1 },
+    });
+    data = res.data;
+    console.log(data);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    return {
+      props: {
+        post: data.post,
+      },
+    };
+  }
 }
 
-const PostsPage: NextPage = ({ data }: any) => {
+const PostsPage: NextPage = ({ post }: any) => {
   return (
     <div>
       <Head>
@@ -43,9 +53,7 @@ const PostsPage: NextPage = ({ data }: any) => {
       </header>
 
       <main>
-        {data.map((post: any) => (
-          <Post post={post} key={post.id} />
-        ))}
+        <Post post={post} key={post.id} />
       </main>
     </div>
   );

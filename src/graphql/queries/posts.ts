@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
-const GET_ALL_POSTS = gql`
-  {
+export const GET_ALL_POSTS = gql`
+  query getAllPosts {
     posts(pagination: { limit: 100000, page: 1 }) {
       data {
         id
@@ -13,7 +13,18 @@ const GET_ALL_POSTS = gql`
       }
     }
   }
-  
+
 `;
 
-export default GET_ALL_POSTS;
+export const GET_ONE_POST = gql`
+query getOnePost($postId: Int) {
+    post(postId: $postId) {
+        id
+        title
+        body
+        author {
+          username
+        }
+    }
+  }
+`

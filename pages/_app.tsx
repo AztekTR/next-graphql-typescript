@@ -1,4 +1,5 @@
 import type { AppProps } from "next/app";
+import Error from "next/error";
 import { createGlobalStyle, ThemeProvider } from "styled-components";
 
 const GlobalStyle = createGlobalStyle`
@@ -19,7 +20,7 @@ const GlobalStyle = createGlobalStyle`
     box-sizing: border-box;
   }
 `;
-
+  
 const theme = {
   colors: {
     primary: "#E5A1CC",
@@ -27,6 +28,10 @@ const theme = {
 };
 
 function MyApp({ Component, pageProps }: AppProps) {
+  if (pageProps.error) {
+    return <Error statusCode={pageProps.error.statusCode} title={pageProps.error.message} />;
+  }
+
   return (
     <>
       <GlobalStyle />
