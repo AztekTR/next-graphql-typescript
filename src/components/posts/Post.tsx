@@ -12,7 +12,11 @@ interface IPost {
   author: IAuthor;
 }
 
-const Post: React.FC<any> = ({ post }: any) => {
+interface IProps {
+  post: IPost | undefined;
+}
+
+const Post: React.FC<IProps> = ({ post }: IProps) => {
   return (
     <Card>
       <CardContent>

@@ -1,9 +1,10 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import { gql } from "@apollo/client";
+import { ApolloQueryResult, gql } from "@apollo/client";
 import client from "../../appolo-client";
 import Post from "../../src/components/posts/Post";
 import { GET_ONE_POST } from "../../src/graphql/queries/posts";
+import { useEffect, useState } from "react";
 
 interface IAuthor {
   username: string;
@@ -19,27 +20,25 @@ interface IProps {
   data: IPost[];
 }
 
-export async function getServerSideProps() {
-  let data;
-  try {
-    const res = await client.query({
-      query: GET_ONE_POST,
-      variables: { postId: 1 },
-    });
-    data = res.data;
-    console.log(data);
-  } catch (err) {
-    console.error(err);
-  } finally {
-    return {
-      props: {
-        post: data.post,
-      },
-    };
-  }
-}
+const PostsPage: NextPage = () => {
+  const [post, setPost] = useState<IPost>();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-const PostsPage: NextPage = ({ post }: any) => {
+  useEffect(() => {
+    setIsLoading(true);
+
+    client
+      .query({
+        query: GET_ONE_POST,
+        variables: { postId: 1 },
+      })
+      .then((res: ApolloQueryResult<any>) => {
+        setPost(res.data.post);
+      });
+
+    setIsLoading(false);
+  }, []);
+
   return (
     <div>
       <Head>
@@ -53,7 +52,7 @@ const PostsPage: NextPage = ({ post }: any) => {
       </header>
 
       <main>
-        <Post post={post} key={post.id} />
+        { isLoading ? 'loading...' : <Post post={post} />}
       </main>
     </div>
   );

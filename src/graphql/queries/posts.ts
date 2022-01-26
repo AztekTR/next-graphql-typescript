@@ -17,7 +17,7 @@ export const GET_ALL_POSTS = gql`
 `;
 
 export const GET_ONE_POST = gql`
-query getOnePost($postId: Int) {
+query getOnePost($postId: ID!) {
     post(postId: $postId) {
         id
         title
