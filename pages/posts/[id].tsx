@@ -1,16 +1,17 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import { gql } from "@apollo/client";
+import { ApolloQueryResult, gql } from "@apollo/client";
 import client from "../../appolo-client";
 import Post from "../../src/components/posts/Post";
-import { GET_ALL_POSTS } from "../../src/graphql/queries/posts/posts";
+import { GET_ONE_POST } from "../../src/graphql/queries/posts/posts";
+import { useEffect, useState } from "react";
 import HeaderHOC from "../../src/shared/HeaderHOC/HeaderHOC";
 import styled from "styled-components";
 import pxToRem from "../../src/utils/pixelsToRem";
 import { IPost } from "../../src/graphql/queries/posts/posts.interface";
 
 interface IProps {
-  data: IPost[];
+  post: IPost;
 }
 
 const Main = styled.main`
@@ -18,26 +19,29 @@ const Main = styled.main`
   margin-right: ${pxToRem(12)}rem;
 `;
 
-export async function getServerSideProps() {
-  const { data } = await client.query({ query: GET_ALL_POSTS });
+export async function getServerSideProps({ params }: any) {
+  const res = await client.query({
+    query: GET_ONE_POST,
+    variables: { postId: params.id },
+  });
 
   return {
     props: {
-      data: data.posts.data,
+      post: res.data.post,
     },
   };
 }
 
-const PostsPage: NextPage<IProps> = ({ data }: IProps) => {
+const PostsPage: NextPage<IProps> = ({ post }: IProps) => {
   return (
-    <HeaderHOC>
-      <Main>
-        <h1>Posts management</h1>
-        {data.map((post: any) => (
-          <Post post={post} key={post.id} isLink />
-        ))}
-      </Main>
-    </HeaderHOC>
+    <div>
+      <HeaderHOC>
+        <Main>
+          <h1>Post management</h1>
+          <Post post={post} />
+        </Main>
+      </HeaderHOC>
+    </div>
   );
 };
 
